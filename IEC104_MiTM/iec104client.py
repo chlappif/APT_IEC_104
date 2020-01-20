@@ -302,11 +302,8 @@ class iec104_tcp_client():
 			output=self._socket.recv(1024)
 		except Exception:
 			if (str(e).find('[Errno 104]')!=-1):
-				#self._socket.close()
 				return 'RST'
 			else:
-				#self._socket.close()
 				return 'Drop'
-#		self._socket.close()
 		self.setRx()
 		return 'Accept'
