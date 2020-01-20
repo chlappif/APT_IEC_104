@@ -30,19 +30,19 @@ class ARP_poisoning:
     def set_iprouter(self, iprouter):
         self.router_ip = iprouter
 
-    def get_filter(self, filter):
+    def get_filter(self):
         return self.filter_
 
-    def get_interface(self, interface):
+    def get_interface(self):
         return self.interface
 
-    def get_ipdest(self, ipdest):
+    def get_ipdest(self):
         return self.target_ip
 
-    def get_ipsrc(self, ipsrc):
+    def get_ipsrc(self):
         return self.attack_ip
 
-    def get_iprouter(self, iprouter):
+    def get_iprouter(self):
         return self.router_ip
 
     # In case you don't know your target MAC address

@@ -1,5 +1,6 @@
 from scapy.all import *
 # IEC104 asdu
+
 class asdu_head(Packet):
 	name = "asdu_head"
 	fields_desc = [ XByteField("TypeID", 0x0d),

