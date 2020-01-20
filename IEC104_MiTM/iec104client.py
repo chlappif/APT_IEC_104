@@ -15,7 +15,7 @@ class iec104_tcp_client():
 		self._socket=socket.socket(socket.AF_INET, socket.SOCK_STREAM, 0)
 		self._socket.settimeout(0.5)
 		l_onoff=1          
-	    	l_linger = 0	
+	    l_linger = 0
 		self._socket.setsockopt(socket.SOL_SOCKET,socket.SO_LINGER,struct.pack('ii', l_onoff, l_linger))
 		self._socket.connect((self._targetip,self._port))
 
@@ -41,7 +41,7 @@ class iec104_tcp_client():
 			self.Tx = 1
 		return self.Tx
 
-	ef buildinfobj13(self,Infobj):
+	def buildinfobj13(self,Infobj):
 		infobj=asdu_infobj_13()
 		infobj.IOA=self.IOA2LE(Infobj[0])
 		value=struct.pack('h',Infobj[1]) 
