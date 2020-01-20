@@ -1,6 +1,6 @@
 from scapy.all import *
-# IEC104 asdu
 
+# IEC104 asdu
 class asdu_head(Packet):
 	name = "asdu_head"
 	fields_desc = [ XByteField("TypeID", 0x0d),
@@ -174,3 +174,13 @@ class u_frame(Packet):
 			XByteField("ApduLen", 0x04),
 			LEShortField("Type", 0x03),
 			LEShortField("UType", 0x0000)]
+
+#help Scapy to build links between layers
+# bind_layers( TCP, u_frame, sport=2404 )
+# bind_layers( TCP, u_frame, dport=2404 )
+bind_layers( TCP, i_frame, sport=2404 )
+bind_layers( TCP, i_frame, dport=2404 )
+# bind_layers( TCP, s_frame, sport=2404 )
+# bind_layers( TCP, s_frame, dport=2404 )
+bind_layers(i_frame, asdu_infobj_13)
+bind_layers(asdu_infobj_13, Padding)

