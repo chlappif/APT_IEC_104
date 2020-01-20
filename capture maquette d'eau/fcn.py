@@ -15,7 +15,7 @@ from keras.layers import Dense
 from sklearn.model_selection import train_test_split, StratifiedKFold
 
 
-data = pd.read_table(os.fspath("/Users/jeannelouisedahan/Documents/3A_SSR/pfe/capture maquette d'eau/Capture Data/right_raspi_data_grosse.txt"), delimiter=",", header=None)
+data = pd.read_table(os.fspath("./Capture Data/right_raspi_data_grosse.txt"), delimiter=",", header=None)
 
 # Conversion from hexa to int when needed...
 def to_decimal(data, listofindexestobechanged):
