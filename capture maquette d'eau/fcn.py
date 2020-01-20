@@ -4,11 +4,13 @@ import os
 import numpy as np
 import time
 from matplotlib import pyplot
+from tensorflow import keras
 
 start_time = time.time()
 seed = 7
 from keras.models import Sequential
 import pandas as pd
+
 from sklearn.preprocessing import Normalizer
 from keras.layers import Dense
 # To divide data into subsets, and in order to use cross-validation
@@ -59,17 +61,17 @@ model.add(Dense(64, activation='relu', kernel_initializer='he_uniform', use_bias
 model.add(Dense(32, activation='relu', kernel_initializer='he_uniform', use_bias=True))
 model.add(Dense(16, activation='relu', kernel_initializer='he_uniform', use_bias=True))
 model.add(Dense(1, input_shape=(16,), activation='linear', use_bias=True))
-
+""""""
 model.compile(loss='mean_absolute_error', optimizer='adam', metrics=['mae'])
 
 maes = []
 
 print(model.summary())
-
+""""""
 plot = True
 for train, val in kfold.split(X_train, y_train):
     # Fit the model
-    history = model.fit(X_train[train], y_train[train], epochs=100, batch_size=64, verbose=0)
+    history = model.fit(X_train[train], y_train[train], epochs=150, batch_size=8, verbose=0)
     # evaluate the model
     scores = model.evaluate(X_train[val], y_train[val], verbose=1)
     print("%s: %.2f" % (model.metrics_names[1], scores[1]))
@@ -93,3 +95,12 @@ model.save("fcn_model.hdf5")
 
 interval = time.time() - start_time
 print('Total time in seconds:', interval)
+""""""
+
+model.load_weights("fcn_model.hdf5")
+
+
+y_pred = model.predict(X_test)
+mae = keras.losses.mean_absolute_error(y_test, y_pred)
+
+print("Mean Absolute Error : ", "%.5f (+/- %.5f)" % (np.mean(mae), np.std(mae)))

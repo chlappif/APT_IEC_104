@@ -1,6 +1,8 @@
 from __future__ import print_function
 import time
 
+from tensorflow import keras
+
 start = time.time()
 from matplotlib import pyplot
 from sklearn.model_selection import train_test_split
@@ -50,26 +52,25 @@ X_val = np.reshape(X_val, (X_val.shape[0], X_val.shape[1], 1))
 X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[1], 1))
 
 lstm_output_size = 70
-
+look_back = 5
 #Model definition
 
 cnn_lstm = Sequential()
 cnn_lstm.add(Conv1D(64, 3, activation="relu", input_shape=(13, 1), padding="same"))
-cnn_lstm.add(MaxPooling1D(pool_length=2))
-cnn_lstm.add(LSTM(300, return_sequences=True))
-cnn_lstm.add(Dropout(0.1)) #Avoid overfitting in the model
-cnn_lstm.add(LSTM(300, return_sequences=True))
+#cnn_lstm.add(MaxPooling1D(pool_length=2))
+cnn_lstm.add(LSTM(64, return_sequences=True))
+cnn_lstm.add(Dropout(0.5)) #Avoid overfitting in the model
 cnn_lstm.add(Flatten())
-cnn_lstm.add(TimeDistributed(Dense(100)))
+cnn_lstm.add(Dense(64, activation="relu"))
 cnn_lstm.add(Activation('linear'))
 cnn_lstm.add(Dense(1, activation="linear"))
 
 print(cnn_lstm.summary())
-
+"""
 cnn_lstm.compile(loss="mean_absolute_error", optimizer="adam", metrics=['mae'])
 
 # train
-history = cnn_lstm.fit(X_train, y_train, epochs=100, batch_size=8, verbose = 0)
+history = cnn_lstm.fit(X_train, y_train, epochs=300, batch_size=8, verbose = 0)
 
 scores = cnn_lstm.evaluate(X_val, y_val, verbose=1)
 print("%s: %.2f" % (cnn_lstm.metrics_names[1], scores[1]))
@@ -81,10 +82,17 @@ plot = True
 if plot:
     pyplot.plot(history.history['mae'], "-r", label="Mean Absolute Error")
     pyplot.legend(loc="upper right")
-
     pyplot.xlabel("Epochs")
     pyplot.title("Evolution of the Mean Absolute Error (LSTM)")
     pyplot.show()
 
 
 cnn_lstm.save("cnn_lstm_model_right.hdf5")
+"""
+cnn_lstm.load_weights("cnn_lstm_model_right.hdf5")
+
+
+y_pred = cnn_lstm.predict(X_test)
+mae = keras.losses.mean_absolute_error(y_test, y_pred)
+
+print("Mean Absolute Error : ", "%.5f (+/- %.5f)" % (np.mean(mae), np.std(mae)))

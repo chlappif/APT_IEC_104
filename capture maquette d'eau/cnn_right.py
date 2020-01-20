@@ -1,6 +1,10 @@
+import matplotlib
 import numpy as np
 import time
+
+import seaborn as seaborn
 from matplotlib import pyplot
+from tensorflow import keras
 
 start_time = time.time()
 
@@ -14,6 +18,7 @@ from keras.layers import Dense, Dropout
 from sklearn.model_selection import train_test_split, StratifiedKFold
 
 data = pd.read_table('Capture Data/right_raspi_data_grosse.txt', delimiter=",", header=None)
+
 
 # Conversion from hexa to int when needed...
 def to_decimal(data, listofindexestobechanged):
@@ -67,7 +72,7 @@ cnn.add(Dropout(0.5))
 
 cnn.add(Dense(1, activation="linear", kernel_initializer='he_uniform', use_bias=True))  # Used to do a regression
 print(cnn.summary())
-
+"""
 # Compile model
 cnn.compile(loss='mean_absolute_error', optimizer='adam', metrics=['mean_absolute_error'])
 
@@ -83,7 +88,7 @@ for train, val in kfold.split(X_train, y_train):
 
     maes.append(scores[1])
 
-    """Code to be used only to print nice plots """
+    Code to be used only to print nice plots 
     if plot:
         pyplot.plot(hist.history['mean_absolute_error'], "-r", label="Mean Absolute Error")
         pyplot.legend(loc="upper right")
@@ -98,6 +103,19 @@ print("Averaged parameters : ")
 print("Mean Absolute Error : ", "%.5f (+/- %.5f)" % (np.mean(maes), np.std(maes)))
 
 cnn.save("cnn_model_right.hdf5")
-
-interval = time.time() - start_time
 print('Total time in seconds:', interval)
+"""
+interval = time.time() - start_time
+cnn.load_weights("cnn_model_right.hdf5")
+
+
+y_pred = cnn.predict(X_test)
+mae = keras.losses.mean_absolute_error(y_test, y_pred)
+
+print("Mean Absolute Error : ", "%.5f (+/- %.5f)" % (np.mean(mae), np.std(mae)))
+
+C_mat = X.corr(X)
+fig = pyplot.figure(figsize = (15,15))
+
+seaborn.heatmap(C_mat, vmax = .8, square = True)
+pyplot.show()
