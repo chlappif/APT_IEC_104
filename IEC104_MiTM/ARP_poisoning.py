@@ -3,8 +3,8 @@
 import sys
 import os
 import time
-from scapy.all import *
-from scapy.layers.l2 import ARP, Ether
+from scapy import *
+
 
 
 class ARP_poisoning:
