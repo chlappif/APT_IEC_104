@@ -3,7 +3,8 @@
 import sys
 import os
 import time
-from scapy import *
+
+from scapy.all import *
 
 
 
