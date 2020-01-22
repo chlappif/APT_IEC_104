@@ -89,7 +89,7 @@ class asdu_infobj_58(Packet):
     fields_desc = [
         X3BytesField("IOA", 0x23),
         XByteField("SCO", 0x80),
-        PacketField("CP56Time", CP56Time)]
+        PacketField("CP56Time", CP56Time, Packet)]
 
 
 class asdu_infobj_59(Packet):
@@ -97,7 +97,7 @@ class asdu_infobj_59(Packet):
     fields_desc = [
         X3BytesField("IOA", 0x23),
         XByteField("DCO", 0x80),
-        PacketField("CP56Time", CP56Time)]
+        PacketField("CP56Time", CP56Time, Packet)]
 
 
 class asdu_infobj_60(Packet):
@@ -105,7 +105,7 @@ class asdu_infobj_60(Packet):
     fields_desc = [
         X3BytesField("IOA", 0x23),
         XByteField("RCO", 0x80),
-        PacketField("CP56Time", CP56Time)]
+        PacketField("CP56Time", CP56Time, Packet)]
 
 
 class asdu_infobj_61(Packet):
@@ -114,7 +114,7 @@ class asdu_infobj_61(Packet):
         X3BytesField("IOA", 0x23),
         StrField("Value", '', fmt="H", remain=0),
         XByteField("QOS", 0x80),
-        PacketField("CP56Time", CP56Time)]
+        PacketField("CP56Time", CP56Time, Packet)]
 
 
 class asdu_infobj_62(Packet):
@@ -123,7 +123,7 @@ class asdu_infobj_62(Packet):
         X3BytesField("IOA", 0x23),
         StrField("Value", '', fmt="H", remain=0),
         XByteField("QOS", 0x80),
-        PacketField("CP56Time", CP56Time)]
+        PacketField("CP56Time", CP56Time, Packet)]
 
 
 class asdu_infobj_63(Packet):
@@ -132,7 +132,7 @@ class asdu_infobj_63(Packet):
         X3BytesField("IOA", 0x23),
         StrField("Value", '', fmt="f", remain=0),
         XByteField("QOS", 0x80),
-        PacketField("CP56Time", CP56Time)]
+        PacketField("CP56Time", CP56Time, Packet)]
 
 
 class asdu_infobj_64(Packet):
@@ -140,7 +140,7 @@ class asdu_infobj_64(Packet):
     fields_desc = [
         X3BytesField("IOA", 0x23),
         StrField("Value", '', fmt="I", remain=0),
-        PacketField("CP56Time", CP56Time)]
+        PacketField("CP56Time", CP56Time, Packet)]
 
 
 class asdu_infobj_100(Packet):
@@ -161,7 +161,7 @@ class asdu_infobj_103(Packet):
     name = "C_CS_NA_1"
     fields_desc = [
         X3BytesField("IOA", 0x00),
-        PacketField("CP56Time", CP56Time)]
+        PacketField("CP56Time", CP56Time, Packet)]
 
 
 # IEC104 apci
