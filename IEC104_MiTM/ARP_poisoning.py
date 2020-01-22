@@ -3,8 +3,8 @@
 import sys
 import os
 import time
-from scapy.all import *
-from scapy.layers.l2 import ARP, Ether
+from scapy import *
+
 
 
 class ARP_poisoning:
@@ -13,7 +13,7 @@ class ARP_poisoning:
     target_ip = "192.168.20.11"
     router_ip = "192.168.20.10"
     attack_ip = "192.168.20.15"
-    forward_ip = False  # change this to True if you use this with other MiTM attack
+    forward_ip = False  # change this to True if you use this with other MiTM attacks
 
     def set_filter(self, filter):
         self.filter_ = filter
