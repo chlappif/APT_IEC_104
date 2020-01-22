@@ -42,8 +42,8 @@ def modify_packet_for_router(chosen_packet):
 
 def modify_mesure_packet(chosen_packet):
 	## TODO connect with DL and neural network solution
-	value = 0
-    chosen_packet[asdu_infobj_13].value = hex(value)
+#	value = 0
+    chosen_packet[asdu_infobj_13].value += hex(1)
 
     # delete the checksum so that scapy will handle them and recalculate them
     del chosen_packet[IP].chksum
