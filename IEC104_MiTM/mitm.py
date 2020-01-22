@@ -9,9 +9,9 @@
 from ARP_poisoning import *
 from iec104lib import *
 
-ip_router = ARP_poisoning.get_iprouter()
-ip_target = ARP_poisoning.get_ipdest()
-ip_attack = ARP_poisoning.get_ipsrc()
+ip_router = ARP_poisoning.router_ip
+ip_target = ARP_poisoning.target_ip
+ip_attack = ARP_poisoning.attack_ip
 mac_router = ARP_poisoning.get_mac(ip_router)
 mac_target = ARP_poisoning.get_mac(ip_target)
 
