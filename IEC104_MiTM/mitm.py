@@ -4,6 +4,7 @@
     Use scapy to modify packets going through your machine.
 
 """
+from scapy.layers.inet import TCP, IP
 
 from ARP_poisoning import *
 from iec104lib import *

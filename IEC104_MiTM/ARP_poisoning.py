@@ -5,7 +5,7 @@ import os
 import time
 
 from scapy.all import *
-
+from scapy.layers.l2 import Ether, ARP
 
 
 class ARP_poisoning:
