@@ -41,20 +41,24 @@ def modify_packet_for_target(chosen_packet):
     chosen_packet[Ether].src = chosen_packet[Ether].dest
     chosen_packet[Ether].dest = mac_target
 
+    # delete the checksum so that scapy will handle them and recalculate them
+    del chosen_packet[IP].chksum
+    del chosen_packet[TCP].chksum
+
 
 def modify_packet_for_router(chosen_packet):
     chosen_packet[Ether].src = chosen_packet[Ether].dest
     chosen_packet[Ether].dest = mac_router
+
+    # delete the checksum so that scapy will handle them and recalculate them
+    del chosen_packet[IP].chksum
+    del chosen_packet[TCP].chksum
 
 
 def modify_mesure_packet(chosen_packet):
     ## TODO connect with DL and neural network solution
     #   value = 0
     chosen_packet[asdu_infobj_13].value += hex(1)
-
-    # delete the checksum so that scapy will handle them and recalculate them
-    del chosen_packet[IP].chksum
-    del chosen_packet[TCP].chksum
 
 
 def is_packet_containing_apci(packet):
