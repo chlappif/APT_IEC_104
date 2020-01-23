@@ -13,7 +13,7 @@ class ARP_poisoning:
     target_ip = ""
     gateway_ip = ""
     attack_ip = ""
-    filter_ = ""
+    filter_ = "ip"
     interface = ""
     forward_ip = True  # change this to True if you use this with other MiTM attacks;
 
@@ -22,7 +22,10 @@ class ARP_poisoning:
         self.target_ip = input('Enter target IP address :')
         self.gateway_ip = input('Enter gateway IP address :')
         self.attack_ip = input('Enter target attack address :')
+        self.attack_ip = input('Enter used interface :')
 
+    def set_interface(self, interface):
+        self.interface = interface
 
     def set_ipdest(self, ipdest):
         self.target_ip = ipdest
@@ -62,10 +65,10 @@ class ARP_poisoning:
     # Comment to use it with MAC
 
     def stop_ip_forward(self):
-        os.system("echo 0 > /proc/sys/net/ipv4/ip_forward")
+        os.system("sudo echo 0 > /proc/sys/net/ipv4/ip_forward")
 
     def start_ip_forward(self):
-        os.system("echo 1 > /proc/sys/net/ipv4/ip_forward")
+        os.system("sudo echo 1 > /proc/sys/net/ipv4/ip_forward")
 
     # if there is any probleme you can restore your network with this function then start again
     def restore_arp_tables(self):

