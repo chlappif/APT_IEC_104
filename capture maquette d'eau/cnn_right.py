@@ -114,8 +114,14 @@ mae = keras.losses.mean_absolute_error(y_test, y_pred)
 
 print("Mean Absolute Error : ", "%.5f (+/- %.5f)" % (np.mean(mae), np.std(mae)))
 
-C_mat = X.corr(X)
-fig = pyplot.figure(figsize = (15,15))
+""""#C_mat = X.corr(X)
+#fig = pyplot.figure(figsize = (15,15))
 
-seaborn.heatmap(C_mat, vmax = .8, square = True)
+#seaborn.heatmap(C_mat, vmax = .8, square = True)
+#pyplot.show()"""
+pyplot.plot(y_test[:200], '-r', label="Reality", marker="*")
+pyplot.plot(y_pred[:200], '-g', label="Prediction")
+pyplot.ylabel("Water level in the right tank (cm)")
+pyplot.legend(loc="lower left")
+pyplot.title("Comparison between water level predictions and reality (CNN)")
 pyplot.show()

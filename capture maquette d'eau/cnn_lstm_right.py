@@ -1,6 +1,7 @@
 from __future__ import print_function
 import time
 
+import numpy
 from tensorflow import keras
 
 start = time.time()
@@ -8,7 +9,7 @@ from matplotlib import pyplot
 from sklearn.model_selection import train_test_split
 
 from keras.models import Sequential
-from keras.layers import MaxPooling1D, Conv1D, TimeDistributed, Activation, Flatten
+from keras.layers import Conv1D, Activation, Flatten
 import pandas as pd
 from sklearn.preprocessing import Normalizer
 from keras.layers import Dense,Dropout
@@ -16,7 +17,7 @@ import numpy as np
 from keras.layers import LSTM
 
 
-data = pd.read_table('Capture Data/right_lstm_raspi_data_grosse.txt', delimiter=",", header=None)
+data = pd.read_table('Capture Data/right_raspi_data_grosse.txt', delimiter=",", header=None)
 
 # Conversion from hexa to int when needed...
 def to_decimal(data, listofindexestobechanged):
@@ -28,7 +29,7 @@ def to_decimal(data, listofindexestobechanged):
     return data
 
 
-data = to_decimal(data, [2])
+data = to_decimal(data, [1])
 
 # =======
 
@@ -56,7 +57,7 @@ look_back = 5
 #Model definition
 
 cnn_lstm = Sequential()
-cnn_lstm.add(Conv1D(64, 3, activation="relu", input_shape=(13, 1), padding="same"))
+cnn_lstm.add(Conv1D(64, 3, activation="relu", input_shape=(12, 1), padding="same"))
 #cnn_lstm.add(MaxPooling1D(pool_length=2))
 cnn_lstm.add(LSTM(64, return_sequences=True))
 cnn_lstm.add(Dropout(0.5)) #Avoid overfitting in the model
@@ -70,7 +71,7 @@ print(cnn_lstm.summary())
 cnn_lstm.compile(loss="mean_absolute_error", optimizer="adam", metrics=['mae'])
 
 # train
-history = cnn_lstm.fit(X_train, y_train, epochs=300, batch_size=8, verbose = 0)
+history = cnn_lstm.fit(X_train, y_train, epochs=150, batch_size=8, verbose = 0)
 
 scores = cnn_lstm.evaluate(X_val, y_val, verbose=1)
 print("%s: %.2f" % (cnn_lstm.metrics_names[1], scores[1]))
@@ -90,9 +91,17 @@ if plot:
 cnn_lstm.save("cnn_lstm_model_right.hdf5")
 """
 cnn_lstm.load_weights("cnn_lstm_model_right.hdf5")
-
-
 y_pred = cnn_lstm.predict(X_test)
 mae = keras.losses.mean_absolute_error(y_test, y_pred)
 
 print("Mean Absolute Error : ", "%.5f (+/- %.5f)" % (np.mean(mae), np.std(mae)))
+
+yy= []
+for elem in y_test :
+    yy.append([elem])
+pyplot.plot(yy[1:200], '-r', label="Reality", marker="*")
+pyplot.plot(y_pred[:200], '-g', label="Prediction", marker="x")
+pyplot.ylabel("Water level in the right tank (cm)")
+pyplot.legend(loc="upper right")
+pyplot.title("Comparison between water level predictions and reality (CNN+LSTM)")
+pyplot.show()

@@ -61,7 +61,7 @@ model.add(Dense(64, activation='relu', kernel_initializer='he_uniform', use_bias
 model.add(Dense(32, activation='relu', kernel_initializer='he_uniform', use_bias=True))
 model.add(Dense(16, activation='relu', kernel_initializer='he_uniform', use_bias=True))
 model.add(Dense(1, input_shape=(16,), activation='linear', use_bias=True))
-""""""
+"""
 model.compile(loss='mean_absolute_error', optimizer='adam', metrics=['mae'])
 
 maes = []
@@ -77,7 +77,7 @@ for train, val in kfold.split(X_train, y_train):
     print("%s: %.2f" % (model.metrics_names[1], scores[1]))
     maes.append(scores[1])
 
-    """Code to be used only to print nice plots """
+    #Code to be used only to print nice plots 
     if plot:
         pyplot.plot(history.history['mae'], "-r", label="Mean Absolute Error")
         pyplot.legend(loc="upper right")
@@ -95,7 +95,7 @@ model.save("fcn_model.hdf5")
 
 interval = time.time() - start_time
 print('Total time in seconds:', interval)
-""""""
+"""
 
 model.load_weights("fcn_model.hdf5")
 
@@ -104,3 +104,9 @@ y_pred = model.predict(X_test)
 mae = keras.losses.mean_absolute_error(y_test, y_pred)
 
 print("Mean Absolute Error : ", "%.5f (+/- %.5f)" % (np.mean(mae), np.std(mae)))
+pyplot.plot(y_test[:200], '-r', label="Reality", marker='*')
+pyplot.plot(y_pred[:200], '-g', label="Prediction")
+pyplot.ylabel("Water level in the right tank (cm)")
+pyplot.legend(loc="upper right")
+pyplot.title("Comparison between water level predictions and reality (FFNN)")
+pyplot.show()
