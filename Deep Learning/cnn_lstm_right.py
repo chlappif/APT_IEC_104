@@ -71,7 +71,6 @@ if make_model:
     # Model definition
     cnn_lstm = Sequential()
     cnn_lstm.add(Conv1D(64, 3, activation="relu", input_shape=(12, 1), padding="same"))
-    # cnn_lstm.add(MaxPooling1D(pool_length=2))
     cnn_lstm.add(LSTM(64, return_sequences=True))
     cnn_lstm.add(Dropout(0.5))  # Avoid overfitting in the model
     cnn_lstm.add(Flatten())
